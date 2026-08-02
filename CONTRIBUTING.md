@@ -90,10 +90,11 @@ Each rule module is self-contained — config, test override, rule implementatio
    - `#[cfg(test)] mod tests` with unit tests
 2. Add `pub mod my_rule;` to `src/rules/{text,ast}/mod.rs`
 3. Add `my_rule: "my-rule",` to the `declare_rules!` invocation in `src/rule_registry.rs`
-4. Add a test fixture in `tests/fixtures/`
-5. Add integration tests in a new `tests/int_my_rule.rs` file
+4. Add `pub use crate::rules::{text,ast}::my_rule::Config as MyRuleConfig;` to `src/config.rs` so the rule is configurable by library consumers
+5. Add a test fixture in `tests/fixtures/`
+6. Add integration tests in a new `tests/int_my_rule.rs` file
 
-Only steps 2 and 3 touch shared files (one line each, append-only), so parallel PRs auto-merge.
+Only steps 2, 3 and 4 touch shared files (one line each, append-only), so parallel PRs auto-merge.
 
 ### Text rules
 

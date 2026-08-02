@@ -129,11 +129,12 @@ Use [Conventional Commits](https://www.conventionalcommits.org/): `feat`, `fix`,
    - `#[cfg(test)] mod tests` with unit tests
 2. Add `pub mod my_rule;` to `src/rules/{text,ast}/mod.rs`
 3. Add `my_rule: "my-rule",` to the `declare_rules!` invocation in `src/rule_registry.rs`
-4. Add a test fixture in `tests/fixtures/`
-5. Add integration tests in a new `tests/int_my_rule.rs` file
-6. Update README.md with rule documentation
+4. Add `pub use crate::rules::{text,ast}::my_rule::Config as MyRuleConfig;` to `src/config.rs` so the rule is configurable by library consumers
+5. Add a test fixture in `tests/fixtures/`
+6. Add integration tests in a new `tests/int_my_rule.rs` file
+7. Update README.md with rule documentation
 
-Only steps 2 and 3 touch shared files, and both are append-only (one line each), so parallel PRs adding different rules will auto-merge without conflicts.
+Only steps 2, 3 and 4 touch shared files, and all are append-only (one line each), so parallel PRs adding different rules will auto-merge without conflicts.
 
 ## Self-linting
 
