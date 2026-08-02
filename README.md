@@ -224,6 +224,10 @@ Three independent checks, each disabled by setting its threshold to `0`:
 | `min_lines` | `10` | Files with fewer non-blank lines are skipped |
 | `skip_header` | `true` | Exclude a leading header comment (licence banner, ownership line) from the counts |
 
+Lines inside a fenced block in a doc comment (a rustdoc example, between ` ``` ` markers) count as code, not prose — a doctest is the thing rustdoc exists to encourage, and pricing it as an essay would make the run caps unusable on well-documented public APIs.
+
+This rule is not suppressible with `// cargo-lint-extra:allow(file-comments)`. The ratio diagnostic is file-scoped and carries no line number; the two run diagnostics point at the last line of the run, which is always a comment line, while suppression comments attach to the next *code* line. Tune the thresholds in the config file, or exclude the file via `[global] exclude`. Note that a suppression comment placed in a run counts as one more comment line in it.
+
 ### redundant-comments
 
 Flags `//` comments that merely restate the code on the next line, helping catch AI-generated noise like `// increment the counter` above `counter += 1`. Doc comments (`///`, `//!`) and directive comments (`SAFETY:`, `TODO`, `FIXME`, etc.) are skipped. Comments with fewer than `min_words` words or more than 20 words are ignored.
