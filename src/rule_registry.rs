@@ -97,6 +97,7 @@ declare_rules! {
     text {
         line_length: "line-length",
         file_length: "file-length",
+        file_comments: "file-comments",
         todo_comments: "todo-comments",
         file_header: "file-header",
         inline_comments: "inline-comments",

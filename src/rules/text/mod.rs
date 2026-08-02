@@ -1,3 +1,4 @@
+pub mod file_comments;
 pub mod file_header;
 pub mod file_length;
 pub mod inline_comments;

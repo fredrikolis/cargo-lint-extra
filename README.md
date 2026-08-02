@@ -109,6 +109,13 @@ level = "warn"
 max_ratio = 0.3
 max_consecutive = 3
 
+[rules.file-comments]
+level = "warn"
+max_ratio = 0.3
+count_doc_comments = true
+max_consecutive = 1
+max_doc_consecutive = 4
+
 [rules.redundant-comments]
 level = "warn"
 similarity_threshold = 0.5
@@ -196,6 +203,26 @@ Two checks are performed:
 |---|---|---|
 | `max_ratio` | `0.3` | Maximum ratio of comment lines to total meaningful lines (0.0–1.0) |
 | `max_consecutive` | `3` | Maximum number of consecutive `//` comment lines |
+
+### file-comments
+
+The file-scoped counterpart to `inline-comments`, in the same way `file-length` is to `line-length`. Disabled by default.
+
+`inline-comments` only sees inside function bodies and never counts doc comments, so comment volume in module headers, on items, between `impl` methods, and in `///` blocks is unbounded — often the larger share of a file. This rule budgets the whole file.
+
+Three independent checks, each disabled by setting its threshold to `0`:
+- **Ratio** — comment lines as a fraction of all non-blank lines
+- **Consecutive** — longest run of adjacent `//` lines, anywhere in the file
+- **Doc consecutive** — longest run of adjacent `///` / `//!` lines, capped separately, because a doc block on a public item is legitimate where a `//` block is not
+
+| Setting | Default | Description |
+|---|---|---|
+| `max_ratio` | `0.3` | Maximum ratio of comment lines to non-blank lines (0.0–1.0) |
+| `count_doc_comments` | `true` | Whether `///` and `//!` count toward the ratio |
+| `max_consecutive` | `0` | Maximum consecutive `//` lines; `0` disables |
+| `max_doc_consecutive` | `0` | Maximum consecutive `///` / `//!` lines; `0` disables |
+| `min_lines` | `10` | Files with fewer non-blank lines are skipped |
+| `skip_header` | `true` | Exclude a leading header comment (licence banner, ownership line) from the counts |
 
 ### redundant-comments
 
