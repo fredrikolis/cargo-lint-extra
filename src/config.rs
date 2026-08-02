@@ -13,6 +13,7 @@ pub use crate::rules::ast::magic_numbers::Config as MagicNumbersConfig;
 pub use crate::rules::ast::string_alloc_in_loop::Config as StringAllocInLoopConfig;
 pub use crate::rules::ast::undocumented_panic::Config as UndocumentedPanicConfig;
 pub use crate::rules::ast::verbose_result_handling::Config as VerboseResultHandlingConfig;
+pub use crate::rules::text::file_comments::Config as FileCommentsConfig;
 pub use crate::rules::text::file_header::Config as FileHeaderConfig;
 pub use crate::rules::text::file_length::Config as FileLengthConfig;
 pub use crate::rules::text::inline_comments::Config as InlineCommentsConfig;
