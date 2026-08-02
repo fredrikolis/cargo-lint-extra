@@ -124,6 +124,15 @@ const fn starts_with(s: &str, prefix: &[u8]) -> bool {
     true
 }
 
+/// Does this doc line open or close a fenced example block?
+fn doc_fence(trimmed: &str) -> bool {
+    let body = trimmed
+        .trim_start_matches("///")
+        .trim_start_matches("//!")
+        .trim();
+    body.starts_with("```")
+}
+
 /// A run of adjacent comment lines: its length and the line it ends on.
 #[derive(Default, Clone, Copy)]
 struct Run {
@@ -175,9 +184,19 @@ impl Rule {
     fn measure(&self, lines: &[&str]) -> Counts {
         let mut c = Counts::default();
         let (mut plain, mut doc) = (0usize, 0usize);
+        let mut in_doctest = false;
         for (offset, raw) in lines.iter().enumerate() {
-            let kind = classify(raw.trim());
+            let mut kind = classify(raw.trim());
             let line_no = offset + 1;
+            // A fenced block inside a doc comment is example CODE, not prose. Counting it as
+            // prose would price a doctest — the thing rustdoc exists to encourage — as if it
+            // were an essay, and no run cap could then tell the two apart.
+            if kind == Kind::Doc && doc_fence(raw.trim()) {
+                in_doctest = !in_doctest;
+                kind = Kind::Code;
+            } else if in_doctest && kind == Kind::Doc {
+                kind = Kind::Code;
+            }
             match kind {
                 Kind::Doc => {
                     doc += 1;
@@ -469,6 +488,28 @@ mod tests {
             d[0].line,
             Some(4),
             "the run ends on file line 4, not body line 2"
+        );
+    }
+
+    #[test]
+    fn a_fenced_doctest_is_code_not_prose() {
+        let r = rule(Config {
+            max_ratio: 0.0,
+            max_doc_consecutive: 4,
+            ..Config::default()
+        });
+        let doctest = "// header\n/// Does a thing.\n///\n/// ```\n/// let a = 1;\n/// let b = 2;\n/// let c = 3;\n/// let d = 4;\n/// let e = 5;\n/// ```\npub fn thing() {}\n".to_string()
+            + &"let x = 1;\n".repeat(20);
+        assert!(
+            check(&r, &doctest).is_empty(),
+            "3 lines of prose around a 5-line example is not a 10-line essay"
+        );
+        let essay =
+            "// header\n".to_string() + &"/// prose\n".repeat(9) + &"let x = 1;\n".repeat(20);
+        assert_eq!(
+            check(&r, &essay).len(),
+            1,
+            "9 lines of unfenced prose still trips"
         );
     }
 
